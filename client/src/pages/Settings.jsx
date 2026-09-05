@@ -4,6 +4,7 @@ import { useAuth } from '../api/AuthContext.jsx';
 import SettingField from '../components/settings/SettingField.jsx';
 import LedDevicesPanel from '../components/settings/LedDevicesPanel.jsx';
 import LedRequirementsPanel from '../components/settings/LedRequirementsPanel.jsx';
+import SharePointPanel from '../components/settings/SharePointPanel.jsx';
 import UsersPanel from '../components/settings/UsersPanel.jsx';
 
 const EVENT_SETTINGS = ['EventId', 'EventName'];
@@ -73,9 +74,7 @@ export default function Settings() {
           {SHAREPOINT_SETTINGS.map((name) => (
             <SettingField key={name} setting={byName[name]} canEdit={canEdit} onSaved={load} />
           ))}
-          <p className="mt-2 text-xs text-text-muted">
-            Sign-in and Test Connection are implemented in Stage 5 (SharePoint authentication and discovery).
-          </p>
+          <SharePointPanel canEdit={canEdit} />
         </>
       )}
 

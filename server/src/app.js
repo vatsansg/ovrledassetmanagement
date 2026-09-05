@@ -7,6 +7,7 @@ import { settingsRoutes } from './routes/settingsRoutes.js';
 import { ledDeviceRoutes } from './routes/ledDeviceRoutes.js';
 import { userRoutes } from './routes/userRoutes.js';
 import { ledRequirementsRoutes } from './routes/ledRequirementsRoutes.js';
+import { sharePointRoutes } from './routes/sharePointRoutes.js';
 
 export function createApp() {
   const app = express();
@@ -42,9 +43,10 @@ export function createApp() {
   app.use('/api/led-devices', ledDeviceRoutes);
   app.use('/api/users', userRoutes);
   app.use('/api/led-requirements', ledRequirementsRoutes);
+  app.use('/api/sharepoint', sharePointRoutes);
 
   // Further routers (runs, ...) are mounted under /api in their respective
-  // implementation stages (Stage 5 onward).
+  // implementation stages (Stage 6 onward).
 
   app.use('/api', notFoundHandler);
   app.use(errorHandler);

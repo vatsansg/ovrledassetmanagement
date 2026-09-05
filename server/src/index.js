@@ -4,6 +4,7 @@ import { env } from './config/env.js';
 import { logger } from './utils/logger.js';
 import { getDb } from './db/index.js';
 import { createApp } from './app.js';
+import { attachWss } from './utils/wsHub.js';
 
 getDb(); // runs migrations + seed on startup
 const app = createApp();
@@ -15,6 +16,7 @@ export const wss = new WebSocketServer({ server, path: '/ws' });
 wss.on('connection', (socket) => {
   socket.send(JSON.stringify({ type: 'connected' }));
 });
+attachWss(wss);
 
 server.listen(env.port, () => {
   logger.info(`LED Asset Manager server listening on port ${env.port}`);
