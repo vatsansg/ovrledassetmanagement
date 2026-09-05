@@ -1,18 +1,8 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { Client } from '@microsoft/microsoft-graph-client';
-import { getDb } from '../db/index.js';
 import { acquireTokenSilent, getSignedInAccount } from './msalService.js';
-
-function getSetting(name) {
-  const db = getDb();
-  return db.prepare('SELECT Value FROM EventSettings WHERE SettingName = ?').get(name)?.Value || null;
-}
-
-function setSetting(name, value) {
-  const db = getDb();
-  db.prepare(
-    `UPDATE EventSettings SET Value = ?, UpdatedAt = strftime('%Y-%m-%dT%H:%M:%fZ', 'now') WHERE SettingName = ?`
-  ).run(value, name);
-}
+import { getSetting, setSetting } from './settingsService.js';
 
 /**
  * Deliberately does not depend on SharePoint's UI query parameters (viewid,
@@ -211,4 +201,31 @@ export async function discoverSourceFiles() {
 
   await walk(folderId, '');
   return files;
+}
+
+/**
+ * Downloads one file's content to a local path, using a .tmp-then-rename
+ * pattern so a partially-downloaded file is never mistaken for a complete
+ * one (plan §17) - if the process dies mid-download, only the .tmp file is
+ * left behind, never a truncated file at the final path.
+ */
+export async function downloadFile(itemId, destPath) {
+  const driveId = getSetting('SharePointDriveId');
+  if (!driveId) throw badRequest('Run Test Connection first to resolve the SharePoint drive');
+
+  fs.mkdirSync(path.dirname(destPath), { recursive: true });
+  const tmpPath = `${destPath}.tmp`;
+
+  const client = getGraphClient();
+  const stream = await client.api(`/drives/${driveId}/items/${itemId}/content`).getStream();
+
+  await new Promise((resolve, reject) => {
+    const writeStream = fs.createWriteStream(tmpPath);
+    stream.on('error', reject);
+    writeStream.on('error', reject);
+    writeStream.on('finish', resolve);
+    stream.pipe(writeStream);
+  });
+
+  fs.renameSync(tmpPath, destPath);
 }

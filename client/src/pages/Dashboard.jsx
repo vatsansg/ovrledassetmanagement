@@ -4,9 +4,11 @@ import { api } from '../api/client.js';
 
 export default function Dashboard() {
   const [status, setStatus] = useState(null);
+  const [lastRun, setLastRun] = useState(null);
 
   useEffect(() => {
     api.get('/settings/status').then(({ data }) => setStatus(data));
+    api.get('/runs').then(({ data }) => setLastRun(data[0] || null));
   }, []);
 
   return (
@@ -30,7 +32,17 @@ export default function Dashboard() {
       </div>
       <div className="card p-4">
         <div className="card-title">Last run</div>
-        <p className="mt-2 text-sm text-text-secondary">Not available</p>
+        {lastRun ? (
+          <>
+            <p className="mt-2 text-sm">{lastRun.Status}</p>
+            <p className="font-mono text-xs text-text-secondary">{lastRun.StartTime}</p>
+          </>
+        ) : (
+          <p className="mt-2 text-sm text-text-secondary">Not available</p>
+        )}
+        <Link to="/processing" className="mt-2 inline-block text-xs text-accent hover:underline">
+          Go to Processing
+        </Link>
       </div>
     </div>
   );
