@@ -13,6 +13,22 @@ ledRequirementsRoutes.get('/', (req, res) => {
   res.json(db.prepare('SELECT * FROM LED_File_Requirements ORDER BY IsActive DESC, CanonicalFilename').all());
 });
 
+ledRequirementsRoutes.patch(
+  '/:id/folder-hint',
+  requireRole('SuperAdmin'),
+  body('sourceFolderHint').optional({ nullable: true }).isString(),
+  (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ error: 'sourceFolderHint must be a string' });
+    const db = getDb();
+    const info = db
+      .prepare('UPDATE LED_File_Requirements SET SourceFolderHint = ? WHERE Id = ?')
+      .run(req.body.sourceFolderHint || null, req.params.id);
+    if (info.changes === 0) return res.status(404).json({ error: 'Requirement not found' });
+    res.json(db.prepare('SELECT * FROM LED_File_Requirements WHERE Id = ?').get(req.params.id));
+  }
+);
+
 ledRequirementsRoutes.post(
   '/preview-import',
   requireRole('SuperAdmin'),

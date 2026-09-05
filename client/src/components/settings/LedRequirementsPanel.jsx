@@ -1,6 +1,27 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../../api/client.js';
 
+function FolderHintInput({ requirement, canEdit, onSaved }) {
+  const [value, setValue] = useState(requirement.SourceFolderHint || '');
+
+  async function handleBlur() {
+    if (!canEdit || value === (requirement.SourceFolderHint || '')) return;
+    await api.patch(`/led-requirements/${requirement.Id}/folder-hint`, { sourceFolderHint: value || null });
+    onSaved?.();
+  }
+
+  return (
+    <input
+      className="input-field !py-1 font-mono"
+      value={value}
+      disabled={!canEdit}
+      placeholder="e.g. 5_Game_Point"
+      onChange={(e) => setValue(e.target.value)}
+      onBlur={handleBlur}
+    />
+  );
+}
+
 export default function LedRequirementsPanel({ canEdit, onChanged }) {
   const fileInputRef = useRef(null);
   const [requirements, setRequirements] = useState([]);
@@ -113,6 +134,7 @@ export default function LedRequirementsPanel({ canEdit, onChanged }) {
             <th className="py-2 pr-3">Required?</th>
             <th className="py-2 pr-3">Fallback</th>
             <th className="py-2 pr-3">Persistent</th>
+            <th className="py-2 pr-3">Source folder hint</th>
             <th className="py-2 pr-3">Description</th>
             <th className="py-2 pr-3">Active</th>
           </tr>
@@ -124,13 +146,16 @@ export default function LedRequirementsPanel({ canEdit, onChanged }) {
               <td className="py-2 pr-3">{r.RequiredOrOptional}</td>
               <td className="py-2 pr-3 font-mono text-text-secondary">{r.FallbackFilename || '—'}</td>
               <td className="py-2 pr-3">{r.IsPersistentAsset ? 'Yes' : ''}</td>
+              <td className="py-2 pr-3">
+                <FolderHintInput requirement={r} canEdit={canEdit} onSaved={load} />
+              </td>
               <td className="py-2 pr-3 text-text-secondary">{r.Description}</td>
               <td className="py-2 pr-3">{r.IsActive ? 'Yes' : 'No'}</td>
             </tr>
           ))}
           {requirements.length === 0 && (
             <tr>
-              <td colSpan={6} className="py-3 text-text-muted">
+              <td colSpan={7} className="py-3 text-text-muted">
                 Not imported yet.
               </td>
             </tr>

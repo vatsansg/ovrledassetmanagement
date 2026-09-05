@@ -13,6 +13,8 @@ export default function LedDevicesPanel({ devices, canEdit, onChanged }) {
   );
   const [savingKey, setSavingKey] = useState(null);
   const [errorKey, setErrorKey] = useState(null);
+  const [testingKey, setTestingKey] = useState(null);
+  const [testResult, setTestResult] = useState({});
 
   function updateDraft(deviceKey, patch) {
     setDrafts((prev) => ({ ...prev, [deviceKey]: { ...prev[deviceKey], ...patch } }));
@@ -31,6 +33,17 @@ export default function LedDevicesPanel({ devices, canEdit, onChanged }) {
     }
   }
 
+  async function testConnection(deviceKey) {
+    setTestingKey(deviceKey);
+    try {
+      const { data } = await api.post(`/led-devices/${deviceKey}/test-connection`);
+      setTestResult((prev) => ({ ...prev, [deviceKey]: data }));
+      onChanged?.();
+    } finally {
+      setTestingKey(null);
+    }
+  }
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
@@ -42,6 +55,7 @@ export default function LedDevicesPanel({ devices, canEdit, onChanged }) {
             <th className="py-2 pr-3">Target path</th>
             <th className="py-2 pr-3">Enabled</th>
             <th className="py-2 pr-3">Connection</th>
+            <th className="py-2 pr-3"></th>
           </tr>
         </thead>
         <tbody>
@@ -80,12 +94,22 @@ export default function LedDevicesPanel({ devices, canEdit, onChanged }) {
               </td>
               <td className="py-2 pr-3">
                 <span className={STATUS_STYLE[d.lastConnectionStatus] || 'status-unknown'}>
-                  {d.lastConnectionStatus === 'UNTESTED' || !d.lastConnectionStatus
-                    ? 'Not tested (Stage 13)'
-                    : d.lastConnectionStatus}
+                  {d.lastConnectionStatus === 'UNTESTED' || !d.lastConnectionStatus ? 'Not tested' : d.lastConnectionStatus}
                 </span>
+                {testResult[d.deviceKey] && (
+                  <span className="ml-2 text-xs text-text-muted">{testResult[d.deviceKey].message}</span>
+                )}
                 {savingKey === d.deviceKey && <span className="ml-2 text-xs text-text-muted">Saving…</span>}
                 {errorKey === d.deviceKey && <span className="ml-2 text-xs text-danger">Save failed</span>}
+              </td>
+              <td className="py-2 pr-3">
+                <button
+                  className="btn-secondary !px-2 !py-1 text-xs"
+                  onClick={() => testConnection(d.deviceKey)}
+                  disabled={testingKey === d.deviceKey}
+                >
+                  {testingKey === d.deviceKey ? 'Testing…' : 'Test Connection'}
+                </button>
               </td>
             </tr>
           ))}

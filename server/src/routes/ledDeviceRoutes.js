@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { body, validationResult } from 'express-validator';
 import { getDb } from '../db/index.js';
 import { requireAuth, requireRole } from '../middleware/requireAuth.js';
+import { testAndRecordDeviceConnection } from '../services/ledConnectionService.js';
 
 export const ledDeviceRoutes = Router();
 
@@ -58,3 +59,13 @@ ledDeviceRoutes.put(
     res.json(db.prepare('SELECT * FROM LEDDevices WHERE DeviceKey = ?').get(req.params.deviceKey));
   }
 );
+
+ledDeviceRoutes.post('/:deviceKey/test-connection', (req, res, next) => {
+  try {
+    const outcome = testAndRecordDeviceConnection(req.params.deviceKey);
+    res.json(outcome);
+  } catch (err) {
+    if (err.status) return res.status(err.status).json({ error: err.message });
+    next(err);
+  }
+});

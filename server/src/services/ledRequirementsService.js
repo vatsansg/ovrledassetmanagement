@@ -51,6 +51,29 @@ const FALLBACK_PATTERN = /\b(?:use|reuse)\s+(?:a copy of\s+)?([\w.\- ]+\.(?:png|
 const PERSISTENT_PATTERN = /keep this file (?:in|on) the av boards/i;
 
 /**
+ * Category A source filenames (e.g. "Champions_Montpellier - LED1.mp4")
+ * share no text with their canonical name - the only reliable signal
+ * observed in the real sample is the source subfolder. Seeded as an
+ * editable suggestion on first import only (never overwritten by a
+ * re-import - see the ON CONFLICT clause below), since a different event
+ * could use a different folder layout and an admin may need to correct it.
+ */
+const DEFAULT_FOLDER_HINTS = {
+  'HOME_Look.png': '2_Home_Look',
+  'Home Look.mp4': '2_Home_Look',
+  'TO.mp4': '3_Time_Out',
+  'gamebreak.mp4': '4_Ganten_Water_Break',
+  'GM_POINT.mp4': '5_Game_Point',
+  'MATCH_POINT.mp4': '6_Match_Point',
+  'CHMP_POINT.mp4': '7_Championship_Point',
+  'winner.mp4': '8_Gen_Winning_Moment'
+  // all-adv.png deliberately has no folder hint: it lives alongside sponsor
+  // ads in 1_Sponsor_Ads with no distinguishing subfolder, so a folder-hint
+  // match would wrongly claim every sponsor file in that folder. It's only
+  // matched via the exact-canonical-filename path in FileDiscoveryService.
+};
+
+/**
  * Two CSV rows ("SJF Winning Moment", "Ganten Waterbreak") have no literal
  * filename in the filename column - see plan §D.1. This resolves both from
  * real confirmed sample data rather than inventing a mapping:
@@ -81,7 +104,8 @@ function deriveRequirement(rawRow) {
     canonicalFilename,
     requiredOrOptional: fallbackFilename ? 'OPTIONAL' : 'REQUIRED',
     fallbackFilename,
-    isPersistentAsset: PERSISTENT_PATTERN.test(description || '') ? 1 : 0
+    isPersistentAsset: PERSISTENT_PATTERN.test(description || '') ? 1 : 0,
+    sourceFolderHintSuggestion: DEFAULT_FOLDER_HINTS[canonicalFilename] || null
   };
 }
 
@@ -161,8 +185,8 @@ export function applyImport(derived, userId) {
 
   const upsert = db.prepare(`
     INSERT INTO LED_File_Requirements
-      (Filename, ActionType, Description, CanonicalFilename, RequiredOrOptional, FallbackFilename, IsPersistentAsset, IsActive, ImportBatchId, ImportedAt)
-    VALUES (@filename, @actionType, @description, @canonicalFilename, @requiredOrOptional, @fallbackFilename, @isPersistentAsset, 1, @batchId, @now)
+      (Filename, ActionType, Description, CanonicalFilename, RequiredOrOptional, FallbackFilename, IsPersistentAsset, IsActive, ImportBatchId, ImportedAt, SourceFolderHint)
+    VALUES (@filename, @actionType, @description, @canonicalFilename, @requiredOrOptional, @fallbackFilename, @isPersistentAsset, 1, @batchId, @now, @sourceFolderHintSuggestion)
     ON CONFLICT (CanonicalFilename) DO UPDATE SET
       Filename = excluded.Filename,
       ActionType = excluded.ActionType,
