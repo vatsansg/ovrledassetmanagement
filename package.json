@@ -1,0 +1,17 @@
+{
+  "name": "ovrledassetmanagement",
+  "version": "0.1.0",
+  "private": true,
+  "description": "LED asset preparation, validation, renaming, sequencing and distribution automation for WTT Sports Presentation.",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev --workspace=server",
+    "dev:client": "npm run dev --workspace=client",
+    "build:client": "npm run build --workspace=client",
+    "start": "npm run start --workspace=server"
+  },
+  "license": "UNLICENSED"
+}

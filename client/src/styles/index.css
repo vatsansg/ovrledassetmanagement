@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg-primary: #f1f5f9;
+  --color-bg-secondary: #ffffff;
+  --color-bg-card: #ffffff;
+  --color-bg-hover: #e2e8f0;
+  --color-border: rgba(148, 163, 184, 0.45);
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-muted: #64748b;
+  --color-accent: #2563eb;
+  --color-success: #22c55e;
+  --color-warning: #eab308;
+  --color-danger: #ef4444;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg-primary: #0a0e1a;
+    --color-bg-secondary: #0f1629;
+    --color-bg-card: #151e35;
+    --color-bg-hover: #1c2844;
+    --color-border: rgba(59, 130, 246, 0.15);
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #94a3b8;
+    --color-text-muted: #64748b;
+    --color-accent: #3b82f6;
+  }
+}
+
+:root[data-theme='dark'] {
+  --color-bg-primary: #0a0e1a;
+  --color-bg-secondary: #0f1629;
+  --color-bg-card: #151e35;
+  --color-bg-hover: #1c2844;
+  --color-border: rgba(59, 130, 246, 0.15);
+  --color-text-primary: #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+  --color-accent: #3b82f6;
+}
+
+html,
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+@layer components {
+  .card {
+    @apply bg-bg-card border border-border rounded-lg;
+  }
+  .card-header {
+    @apply flex items-center justify-between px-4 py-3 border-b border-border;
+  }
+  .card-title {
+    @apply text-sm font-semibold text-text-primary;
+  }
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-lg bg-accent px-3 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 rounded-lg border border-border bg-bg-secondary px-3 py-2 text-sm font-medium text-text-primary hover:bg-bg-hover disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-danger {
+    @apply inline-flex items-center gap-2 rounded-lg bg-danger px-3 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .input-field {
+    @apply block w-full rounded-lg border border-border bg-bg-secondary px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-accent;
+  }
+  .status-up {
+    @apply text-success;
+  }
+  .status-down {
+    @apply text-danger;
+  }
+  .status-warning {
+    @apply text-warning;
+  }
+  .status-unknown {
+    @apply text-text-muted;
+  }
+}
