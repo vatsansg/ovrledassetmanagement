@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Settings as SettingsIcon, PlayCircle, History, Menu, Moon, Sun } from 'lucide-react';
+import { LayoutDashboard, Settings as SettingsIcon, PlayCircle, History, Menu, Moon, Sun, LogOut } from 'lucide-react';
+import { useAuth } from '../api/AuthContext.jsx';
+import ChangePasswordModal from './ChangePasswordModal.jsx';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -10,8 +12,10 @@ const NAV_ITEMS = [
 ];
 
 export default function Shell() {
+  const { user, logout } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [theme, setTheme] = useState(() => document.documentElement.getAttribute('data-theme') || 'dark');
+  const [passwordPromptDismissed, setPasswordPromptDismissed] = useState(false);
 
   function toggleTheme() {
     const next = theme === 'dark' ? 'light' : 'dark';
@@ -54,15 +58,26 @@ export default function Shell() {
           <button className="lg:hidden" onClick={() => setSidebarOpen(true)}>
             <Menu size={18} />
           </button>
-          <div className="hidden lg:block" />
-          <button className="btn-secondary !px-2 !py-1.5" onClick={toggleTheme} aria-label="Toggle theme">
-            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
+          <div className="hidden lg:flex items-center gap-2 text-sm text-text-secondary">
+            <span className="font-mono">{user?.username}</span>
+            <span className="rounded bg-bg-hover px-2 py-0.5 text-xs">{user?.role}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="btn-secondary !px-2 !py-1.5" onClick={toggleTheme} aria-label="Toggle theme">
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+            <button className="btn-secondary !px-2 !py-1.5" onClick={logout} aria-label="Sign out">
+              <LogOut size={16} />
+            </button>
+          </div>
         </header>
         <main className="flex-1 overflow-y-auto p-4">
           <Outlet />
         </main>
       </div>
+      {user?.mustChangePassword && !passwordPromptDismissed && (
+        <ChangePasswordModal onDone={() => setPasswordPromptDismissed(true)} />
+      )}
     </div>
   );
 }

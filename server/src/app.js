@@ -3,6 +3,9 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { notFoundHandler, errorHandler } from './middleware/errorHandler.js';
 import { authRoutes } from './routes/authRoutes.js';
+import { settingsRoutes } from './routes/settingsRoutes.js';
+import { ledDeviceRoutes } from './routes/ledDeviceRoutes.js';
+import { userRoutes } from './routes/userRoutes.js';
 
 export function createApp() {
   const app = express();
@@ -34,9 +37,12 @@ export function createApp() {
     })
   );
   app.use('/api/auth', authRoutes);
+  app.use('/api/settings', settingsRoutes);
+  app.use('/api/led-devices', ledDeviceRoutes);
+  app.use('/api/users', userRoutes);
 
-  // Further routers (settings, led-devices, requirements, runs, ...) are mounted
-  // under /api in their respective implementation stages (Stage 3 onward).
+  // Further routers (requirements, runs, ...) are mounted under /api in
+  // their respective implementation stages (Stage 4 onward).
 
   app.use('/api', notFoundHandler);
   app.use(errorHandler);
