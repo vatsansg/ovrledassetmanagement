@@ -6,6 +6,7 @@ import { authRoutes } from './routes/authRoutes.js';
 import { settingsRoutes } from './routes/settingsRoutes.js';
 import { ledDeviceRoutes } from './routes/ledDeviceRoutes.js';
 import { userRoutes } from './routes/userRoutes.js';
+import { ledRequirementsRoutes } from './routes/ledRequirementsRoutes.js';
 
 export function createApp() {
   const app = express();
@@ -40,9 +41,10 @@ export function createApp() {
   app.use('/api/settings', settingsRoutes);
   app.use('/api/led-devices', ledDeviceRoutes);
   app.use('/api/users', userRoutes);
+  app.use('/api/led-requirements', ledRequirementsRoutes);
 
-  // Further routers (requirements, runs, ...) are mounted under /api in
-  // their respective implementation stages (Stage 4 onward).
+  // Further routers (runs, ...) are mounted under /api in their respective
+  // implementation stages (Stage 5 onward).
 
   app.use('/api', notFoundHandler);
   app.use(errorHandler);

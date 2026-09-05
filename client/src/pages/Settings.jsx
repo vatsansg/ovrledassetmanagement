@@ -3,6 +3,7 @@ import { api } from '../api/client.js';
 import { useAuth } from '../api/AuthContext.jsx';
 import SettingField from '../components/settings/SettingField.jsx';
 import LedDevicesPanel from '../components/settings/LedDevicesPanel.jsx';
+import LedRequirementsPanel from '../components/settings/LedRequirementsPanel.jsx';
 import UsersPanel from '../components/settings/UsersPanel.jsx';
 
 const EVENT_SETTINGS = ['EventId', 'EventName'];
@@ -87,14 +88,7 @@ export default function Settings() {
         <LedDevicesPanel devices={status.devices} canEdit={canEdit} onChanged={load} />
       )}
 
-      {tab === 'LED Requirements' && (
-        <p className="text-sm text-text-secondary">
-          {status.ledRequirementsImported
-            ? `${status.ledRequirementsCount} requirement(s) imported.`
-            : 'Not imported yet.'}{' '}
-          Import/re-import from LED_File_Requirements.csv is implemented in Stage 4.
-        </p>
-      )}
+      {tab === 'LED Requirements' && <LedRequirementsPanel canEdit={canEdit} onChanged={load} />}
 
       {tab === 'Users' && canEdit && <UsersPanel />}
     </div>
