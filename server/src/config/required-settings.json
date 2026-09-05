@@ -1,0 +1,86 @@
+[
+  {
+    "settingName": "EventId",
+    "description": "Identifier for the current event, used as the EventId column in the generated Sequence CSV.",
+    "dataType": "string",
+    "isRequired": true,
+    "isSensitive": false
+  },
+  {
+    "settingName": "EventName",
+    "description": "Human-readable event name shown throughout the UI.",
+    "dataType": "string",
+    "isRequired": true,
+    "isSensitive": false
+  },
+  {
+    "settingName": "SharePointSourceLocation",
+    "description": "Human-facing SharePoint URL for the source folder (e.g. .../LED Files/For WTT). Resolved to a Site/Library/Folder ID via Test Connection.",
+    "dataType": "url",
+    "isRequired": true,
+    "isSensitive": false
+  },
+  {
+    "settingName": "AzureAdTenantId",
+    "description": "Azure AD tenant ID or domain (e.g. worldtabletennis.com) used for Microsoft 365 sign-in.",
+    "dataType": "string",
+    "isRequired": true,
+    "isSensitive": false
+  },
+  {
+    "settingName": "AzureAdClientId",
+    "description": "Client ID of the Azure AD App Registration (public client) used for MSAL sign-in. Must be created in the tenant before this can be set.",
+    "dataType": "string",
+    "isRequired": true,
+    "isSensitive": false
+  },
+  {
+    "settingName": "SharePointSiteId",
+    "description": "Resolved automatically by Test Connection. Do not edit directly.",
+    "dataType": "string",
+    "isRequired": false,
+    "isSensitive": false
+  },
+  {
+    "settingName": "SharePointDriveId",
+    "description": "Resolved automatically by Test Connection. Do not edit directly.",
+    "dataType": "string",
+    "isRequired": false,
+    "isSensitive": false
+  },
+  {
+    "settingName": "SharePointFolderId",
+    "description": "Resolved automatically by Test Connection. Do not edit directly.",
+    "dataType": "string",
+    "isRequired": false,
+    "isSensitive": false
+  },
+  {
+    "settingName": "LocalDownloadFolder",
+    "description": "Local folder where valid source assets are downloaded.",
+    "dataType": "path",
+    "isRequired": true,
+    "isSensitive": false
+  },
+  {
+    "settingName": "RenamedAssetsFolder",
+    "description": "Local folder where canonically renamed per-device assets are written.",
+    "dataType": "path",
+    "isRequired": true,
+    "isSensitive": false
+  },
+  {
+    "settingName": "DefaultAssetFolder",
+    "description": "Local folder holding admin-maintained fallback assets (per-device-resolution copies of default.png/default.mp4 etc).",
+    "dataType": "path",
+    "isRequired": true,
+    "isSensitive": false
+  },
+  {
+    "settingName": "RunningOrderFile",
+    "description": "Optional explicit path/filename override for the running-order workbook. If blank, the single .xlsx file found during the recursive SharePoint source scan is used automatically; multiple .xlsx files found with this blank is a blocking ambiguity.",
+    "dataType": "string",
+    "isRequired": false,
+    "isSensitive": false
+  }
+]

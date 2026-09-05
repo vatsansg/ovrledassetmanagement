@@ -2,8 +2,10 @@ import http from 'node:http';
 import { WebSocketServer } from 'ws';
 import { env } from './config/env.js';
 import { logger } from './utils/logger.js';
+import { getDb } from './db/index.js';
 import { createApp } from './app.js';
 
+getDb(); // runs migrations + seed on startup
 const app = createApp();
 const server = http.createServer(app);
 
