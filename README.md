@@ -29,4 +29,40 @@ Health check: `GET http://localhost:4000/api/health`
 
 ## Status
 
-This is under active build-out, staged per the approved implementation plan (19 stages: repository/architecture → database → configuration → LED requirements import → SharePoint auth/discovery → hashing → validation → status detection → download → renaming/fallback → running order → sequence CSV → LED device config/connection testing → distribution → UI integration → logging/audit → manual QA → Windows installer → end-to-end verification). See commit history and stage-by-stage progress notes for current status.
+All 19 implementation stages have been built. The full pipeline
+(discovery → classification → validation → NEW/MODIFIED/NO_CHANGE
+detection → download → renaming/fallback → running-order/sequence
+generation → distribution) has been verified end-to-end against the
+complete real sample dataset in `references/`, including catching and
+fixing two real bugs along the way (an orphaned sponsor file being
+distributed anyway, and unmatched/excluded files not being persisted for
+later review) - see the git history for details on each stage.
+
+Two things could not be exercised in this development environment and
+still need real-world verification:
+
+- **Live SharePoint sign-in and discovery** - requires an Azure AD App
+  Registration in the target tenant (see `docs/azure-ad-setup.md`) and an
+  operator's own interactive Microsoft 365 login, which this assistant
+  must never perform on the user's behalf. The code path is real and
+  complete; only the live tenant round-trip is unverified.
+- **The Windows installer** - `installer/LedAssetManager.iss` and
+  `installer/build.ps1` are complete, but compiling them requires Inno
+  Setup and a portable Node.js runtime that weren't available in this
+  environment. See `installer/README.md` for exact setup steps.
+
+See `qa/manual-test-plan.md` for the full scenario checklist and which
+items are verified vs. still pending.
+
+## Production build
+
+```bash
+powershell -File installer\build.ps1     # requires Inno Setup + a portable Node runtime, see installer/README.md
+```
+
+Or run the production server directly against a manually-built client:
+
+```bash
+npm run build:client
+npm start                                 # serves both the API and the built client from :4000
+```

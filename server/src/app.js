@@ -1,3 +1,6 @@
+import path from 'node:path';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import express from 'express';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -48,6 +51,21 @@ export function createApp() {
   app.use('/api/runs', runRoutes);
 
   app.use('/api', notFoundHandler);
+
+  // In the installed app, client/ is a sibling of server/ (see installer/),
+  // with the Vite build output at client/dist. In dev, the client is
+  // served separately by the Vite dev server instead - checking dist/
+  // specifically (not client/index.html, which is the unbuilt source
+  // template and always exists in this repo) means this only activates
+  // once a real production build exists.
+  const clientDist = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'client', 'dist');
+  if (fs.existsSync(path.join(clientDist, 'index.html'))) {
+    app.use(express.static(clientDist));
+    app.get(/^(?!\/api).*/, (req, res) => {
+      res.sendFile(path.join(clientDist, 'index.html'));
+    });
+  }
+
   app.use(errorHandler);
 
   return app;

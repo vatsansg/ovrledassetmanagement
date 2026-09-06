@@ -10,5 +10,8 @@ build/
 *.sqlite3
 server/data/
 server/logs/
+installer/vendor/
+installer/stage/
+installer/output/
 .DS_Store
 Thumbs.db
